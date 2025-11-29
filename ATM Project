@@ -1,0 +1,63 @@
+def main():
+    balance = 50000.00
+    PIN = "1234"
+    max_attempts = 3
+
+    for attempt in range(1, max_attempts + 1):
+        entered = input("Enter your ATM PIN: ").strip()
+        if entered == PIN:
+            print("Access granted.\n")
+            while True:
+                print("1. Deposit")
+                print("2. Withdraw")
+                print("3. Check balance")
+                print("4. Exit")
+                choice = input("Choose an option (1-4): ").strip()
+
+                if choice == "1":
+                    amt_str = input("Amount to deposit: ").strip()
+                    try:
+                        amt = float(amt_str)
+                        if amt <= 0:
+                            print("Enter an amount greater than 0.")
+                        else:
+                            balance += amt
+                            print(f"Deposited: {amt:.2f}. Balance: {balance:.2f}")
+                    except ValueError:
+                        print("Invalid amount. Please enter a number.")
+
+                elif choice == "2":
+                    amt_str = input("Amount to withdraw: ").strip()
+                    try:
+                        amt = float(amt_str)
+                        if amt <= 0:
+                            print("Enter an amount greater than 0.")
+                        elif amt > balance:
+                            print("Insufficient balance.")
+                        else:
+                            balance -= amt
+                            print(f"Withdrawn: {amt:.2f}. Balance: {balance:.2f}")
+                    except ValueError:
+                        print("Invalid amount. Please enter a number.")
+
+                elif choice == "3":
+                    print(f"Current balance: {balance:.2f}")
+
+                elif choice == "4":
+                    print("Goodbye.")
+                    return
+
+                else:
+                    print("Invalid choice. Enter 1, 2, 3, or 4.")
+
+            break
+        else:
+            remaining = max_attempts - attempt
+            if remaining:
+                print(f"Wrong PIN. {remaining} attempt(s) left.")
+            else:
+                print("Card blocked. Too many failed attempts.")
+
+
+if __name__ == "__main__":
+    main()
