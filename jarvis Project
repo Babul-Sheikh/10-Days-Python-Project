@@ -1,0 +1,134 @@
+import pyttsx3
+import speech_recognition as sr
+import webbrowser
+import os
+import subprocess
+import datetime
+import pywhatkit # it is used to send whatsapp messages
+
+speaker = pyttsx3.init()
+speaker.setProperty('rate', 150)
+speaker.setProperty('volume', 1.0)
+mic = sr.Recognizer()
+
+def speak(text):
+    """Speak text and print it"""
+    print(f"JARVIS: {text}")
+    speaker.say(text)
+    speaker.runAndWait()
+
+def tell_time():
+    """Tell current time"""
+    time = datetime.datetime.now().strftime("%H:%M:%S")
+    speak(f"The current time is {time}")
+
+def open_notepad():
+    """Open Notepad"""
+    speak("Opening Notepad")
+    try:
+        os.startfile("notepad.exe")
+    except:
+        subprocess.Popen(["notepad.exe"])
+
+def open_calculator():
+    """Open Calculator"""
+    speak("Opening Calculator")
+    try:
+        os.startfile("calc.exe")
+    except:
+        subprocess.Popen(["calc.exe"])
+
+def open_whatsapp():
+    """Open WhatsApp web"""
+    speak("Opening WhatsApp")
+    webbrowser.open("https://web.whatsapp.com")
+
+def open_whatsapp_desktop():
+    """Open WhatsApp desktop app"""
+    speak("Opening WhatsApp desktop")
+    try:
+        subprocess.Popen(r"C:\Users\ankit\AppData\Local\WhatsApp\WhatsApp.exe")
+    except FileNotFoundError:
+        speak("WhatsApp Desktop not found. Opening web version.")
+        open_whatsapp()
+
+def open_browser():
+    """Open default browser"""
+    speak("Opening browser")
+    webbrowser.open("https://www.google.com")
+
+def play_song_youtube(song_name):
+    """Play song on YouTube"""
+    speak(f"Playing {song_name} on YouTube")
+    url = f"https://www.youtube.com/results?search_query={song_name.replace(' ', '+')}"
+    webbrowser.open(url)
+
+def search_google(query):
+    """Search on Google"""
+    speak(f"Searching for {query}")
+    webbrowser.open(f"https://www.google.com/search?q={query.replace(' ', '+')}")
+
+def process_command(text):
+    """Process voice command"""
+    text_lower = text.lower()
+    
+    if "time" in text_lower:
+        tell_time()
+    elif "notepad" in text_lower or "note" in text_lower:
+        open_notepad()
+    elif "calculator" in text_lower or "calc" in text_lower:
+        open_calculator()
+    elif "whatsapp" in text_lower or "what's app" in text_lower:
+        if "web" in text_lower:
+            open_whatsapp()
+        else:
+            open_whatsapp_desktop()
+    elif "play" in text_lower and "youtube" in text_lower:
+        song_name = text_lower.replace("play", "").replace("on youtube", "").strip()
+        if song_name:
+            play_song_youtube(song_name)
+        else:
+            speak("Please specify a song name")
+    elif "search" in text_lower or "google" in text_lower:
+        query = text_lower.replace("search", "").replace("google", "").strip()
+        if query:
+            search_google(query)
+        else:
+            speak("Please specify what to search for")
+    elif "browser" in text_lower or "open web" in text_lower:
+        open_browser()
+    elif any(k in text_lower for k in ("exit", "quit", "stop", "bye")):
+        speak("Goodbye!")
+        return False
+    else:
+        speak("I didn't recognize that command. Try playing a song, opening an app, or asking for the time.")
+    return True
+
+def main():
+    """Main function to run JARVIS"""
+    speak("Welcome to Jarvis")
+    speak("How can I assist you today?")
+    
+    with sr.Microphone() as source:
+        mic.adjust_for_ambient_noise(source, duration=1)
+        print("Listening... Say 'play music', 'open notepad', 'tell time', 'open calculator', or 'exit'")
+        
+        running = True
+        while running:
+            try:
+                print("Start Speaking...")
+                audio = mic.listen(source, timeout=5, phrase_time_limit=6)
+                text = mic.recognize_google(audio)
+                print(f"You said: {text}")
+                running = process_command(text)
+            except sr.WaitTimeoutError:
+                continue
+            except sr.UnknownValueError:
+                print("Could not understand audio")
+                continue
+            except sr.RequestError as e:
+                print(f"Recognition error: {e}")
+                break
+
+if __name__ == "__main__":
+    main()
