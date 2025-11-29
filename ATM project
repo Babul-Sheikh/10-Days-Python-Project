@@ -1,0 +1,36 @@
+Balance= 50000
+pin= 1234
+attempt= 0
+max_attempt = 3
+
+while attempt<max_attempt :
+    Pass= int(input("Enter Your ATM PIN :"))
+    if Pass==pin:
+        print("Access Granted")
+        print("""
+        1. Cash Deposit
+        2. Withdraw Money
+        3. Check Balance
+        4. Exit
+        """)
+        choice=int(input("Enter your choice :"))
+        if choice==2:
+            amount=int(input("Enter Ammount to withdraw:"))
+            if amount < Balance :
+                Balance -= amount
+                print("Withdrawal Successfully")
+                print("Remaining Balance :",Balance)
+            else:
+                print("Insufficient Balance")
+        elif choice==1:
+            amount=int(input("Enter Ammount to Deposit:"))
+            Balance += amount
+            print("Current Balance is :",Balance)
+        elif choice==3:
+            print("Current Balance :",Balance)
+        elif choice==4:
+            print("Byy byy")
+            break
+    else:
+        attempt += 1
+        print(f"{3-attempt} Attempt left")
